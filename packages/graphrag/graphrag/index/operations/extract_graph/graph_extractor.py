@@ -22,7 +22,7 @@ from graphrag.prompts.index.extract_graph import (
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
-    from graphrag_llm.types import LLMCompletionResponse
+    from graphrag_llm.types import LLMCompletionMessagesParam, LLMCompletionResponse
 
 INPUT_TEXT_KEY = "input_text"
 RECORD_DELIMITER_KEY = "record_delimiter"
@@ -84,8 +84,7 @@ class GraphExtractor:
         )
 
     async def _process_document(self, text: str, entity_types: list[str]) -> str:
-
-        logger.info(f"prompt template: {self._extraction_prompt}")
+        logger.info("prompt template:\n%s", self._extraction_prompt)
         
         messages_builder = CompletionMessagesBuilder().add_user_message(
             self._extraction_prompt.format(**{
@@ -94,7 +93,7 @@ class GraphExtractor:
             })
         )
 
-        logger.info(f"user> {messages_builder.build()}")
+        logger.info("messages:\n%s", _format_messages(messages_builder.build()))
 
         response: LLMCompletionResponse = await self._model.completion_async(
             messages=messages_builder.build(),
@@ -117,9 +116,13 @@ class GraphExtractor:
 
             for i in range(self._max_gleanings):
 
-                logger.info(f"[{cnt}] user> {messages_builder.build()}")
-
+                # 尝试审核代码
                 messages_builder.add_user_message(CONTINUE_PROMPT)
+                logger.info(
+                    "[%s] messages:\n%s",
+                    cnt,
+                    _format_messages(messages_builder.build()),
+                )
                 response: LLMCompletionResponse = await self._model.completion_async(
                     messages=messages_builder.build(),
                 )  # type: ignore
@@ -135,7 +138,11 @@ class GraphExtractor:
 
                 messages_builder.add_user_message(LOOP_PROMPT)
 
-                logger.info(f"[{cnt}] user> {messages_builder.build()}")
+                logger.info(
+                    "[%s] messages:\n%s",
+                    cnt,
+                    _format_messages(messages_builder.build()),
+                )
                 
                 response: LLMCompletionResponse = await self._model.completion_async(
                     messages=messages_builder.build(),
@@ -205,6 +212,15 @@ class GraphExtractor:
         )
 
         return entities_df, relationships_df
+
+
+def _format_messages(messages: "LLMCompletionMessagesParam") -> str:
+    """Display chat roles and message bodies with their original line breaks."""
+    if isinstance(messages, str):
+        return messages
+    return "\n\n".join(
+        f"{message['role']}>\n{message.get('content') or ''}" for message in messages
+    )
 
 
 def _empty_entities_df() -> pd.DataFrame:
