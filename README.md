@@ -24,6 +24,7 @@
 
 ## Read Codes Notes
 
+我的阅读笔记路径
 [mynotes](./mynotes/README.md)
 
 ## Overview

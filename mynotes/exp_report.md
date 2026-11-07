@@ -2,10 +2,19 @@
 
 ## 测试文本
 
+将下面的文本放到工程的根目录下的 `input\book.txt`
+
 ```txt
 A 和 B 今天早上一起出去玩
 B 和 C 今天晚上一起吃饭
 A 和 C 是同事
+```
+
+## 执行测试
+
+运行命令
+```shell
+graphrag index
 ```
 
 ## extract_graph
