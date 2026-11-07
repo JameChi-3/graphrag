@@ -24,7 +24,7 @@
 
 ## Read Codes Notes
 
-
+[mynotes](./mynotes/README.md)
 
 ## Overview
 
