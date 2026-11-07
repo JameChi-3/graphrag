@@ -27,6 +27,8 @@ async def build_noun_graph(
     cache: Cache,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Build a noun graph from text units."""
+
+    # 提取节点
     title_to_ids = await _extract_nodes(
         text_unit_table,
         text_analyzer,
@@ -45,6 +47,7 @@ async def build_noun_graph(
         columns=["title", "frequency", "text_unit_ids"],
     )
 
+    # 提取节点之间的关系
     edges_df = _extract_edges(
         title_to_ids,
         nodes_df=nodes_df,

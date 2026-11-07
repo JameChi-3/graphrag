@@ -86,6 +86,7 @@ async def run_workflow(
         )
 
     logger.info("Workflow completed: extract_graph")
+    
     return WorkflowFunctionOutput(
         result={
             "entities": entities,
@@ -110,6 +111,7 @@ async def extract_graph(
     summarization_num_threads: int,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """All the steps to create the base entity graph."""
+    # 提取实体和关系
     # this returns a graph for each text unit, to be merged later
     extracted_entities, extracted_relationships = await extractor(
         text_units=text_units,

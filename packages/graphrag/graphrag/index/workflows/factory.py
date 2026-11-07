@@ -47,6 +47,9 @@ class PipelineFactory:
         logger.info("Creating pipeline with workflows: %s", workflows)
         return Pipeline([(name, cls.workflows[name]) for name in workflows])
 
+"""
+这里工作流是从下面的开始的
+"""
 
 # --- Register default implementations ---
 _standard_workflows = [

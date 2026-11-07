@@ -62,6 +62,7 @@ class GraphExtractor:
         """Extract entities and relationships from the supplied text."""
         try:
             # Invoke the entity extraction
+            logger.info(f"start  Invoke the entity extraction")
             result = await self._process_document(text, entity_types)
         except Exception as e:  # pragma: no cover - defensive logging
             logger.exception("error extracting graph")
@@ -83,6 +84,9 @@ class GraphExtractor:
         )
 
     async def _process_document(self, text: str, entity_types: list[str]) -> str:
+
+        logger.info(f"prompt template: {self._extraction_prompt}")
+        
         messages_builder = CompletionMessagesBuilder().add_user_message(
             self._extraction_prompt.format(**{
                 INPUT_TEXT_KEY: text,
@@ -90,20 +94,37 @@ class GraphExtractor:
             })
         )
 
+        logger.info(f"user> {messages_builder.build()}")
+
         response: LLMCompletionResponse = await self._model.completion_async(
             messages=messages_builder.build(),
         )  # type: ignore
         results = response.content
+
+        logger.info(f"ai> {response.content}")
+
         messages_builder.add_assistant_message(results)
 
         # if gleanings are specified, enter a loop to extract more entities
         # there are two exit criteria: (a) we hit the configured max, (b) the model says there are no more entities
+        # 如果指定了限制条件，则进入循环以提取更多实体
+        # 有两个退出条件：(a) 达到配置的最大数量；(b) 模型表明没有更多实体了
+
+        cnt = 1
         if self._max_gleanings > 0:
+
+            logger.info(f"start process {cnt} ---------")
+
             for i in range(self._max_gleanings):
+
+                logger.info(f"[{cnt}] user> {messages_builder.build()}")
+
                 messages_builder.add_user_message(CONTINUE_PROMPT)
                 response: LLMCompletionResponse = await self._model.completion_async(
                     messages=messages_builder.build(),
                 )  # type: ignore
+                logger.info(f"[{cnt}] ai> {response.content}")
+                
                 response_text = response.content
                 messages_builder.add_assistant_message(response_text)
                 results += response_text
@@ -113,11 +134,19 @@ class GraphExtractor:
                     break
 
                 messages_builder.add_user_message(LOOP_PROMPT)
+
+                logger.info(f"[{cnt}] user> {messages_builder.build()}")
+                
                 response: LLMCompletionResponse = await self._model.completion_async(
                     messages=messages_builder.build(),
                 )  # type: ignore
+                logger.info(f"[{cnt}] ai> {response.content}")
+                
                 if response.content != "Y":
+                    logger.info("quit extract....")
                     break
+
+                cnt += 1
 
         return results
 

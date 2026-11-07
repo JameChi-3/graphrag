@@ -97,10 +97,13 @@ async def create_base_text_units(
     sample_size = 5
 
     async for doc in documents_table:
+        # chunk data
         chunks = chunk_document(doc, chunker, prepend_metadata)
         for chunk_text in chunks:
             if chunk_text is None:
                 continue
+
+            # 加入meta info数据
             row = {
                 "id": "",
                 "document_id": doc["id"],
@@ -157,4 +160,5 @@ def chunk_document(
         metadata = document.collect(prepend_metadata)
         transformer = add_metadata(metadata=metadata, line_delimiter=".\n")
 
+    # 这里最重要的是加入 meta 数据
     return [chunk.text for chunk in chunker.chunk(doc["text"], transform=transformer)]
