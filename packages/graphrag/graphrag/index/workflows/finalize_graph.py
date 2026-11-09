@@ -21,6 +21,9 @@ from graphrag.index.operations.finalize_relationships import (
 from graphrag.index.operations.snapshot_graphml import snapshot_graphml
 from graphrag.index.typing.context import PipelineRunContext
 from graphrag.index.typing.workflow import WorkflowFunctionOutput
+from graphrag.utils.pickle_utils import pickle_save, pickle_load
+
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +87,10 @@ async def finalize_graph(
             Sample rows keyed by ``"entities"`` and
             ``"relationships"``, up to 5 each.
     """
+
+    # pickle_save(entities_table, "tmp/entities_table.pkl")
+    # pickle_save(relationships_table, "tmp/relationships_table.pkl")
+
     degree_map = await _build_degree_map(relationships_table)
 
     entity_samples = await finalize_entities(entities_table, degree_map)
@@ -123,3 +130,10 @@ async def _build_degree_map(
             degree[lo] += 1
             degree[hi] += 1
     return dict(degree)
+
+
+if __name__ == "__main__":
+    entities_table = pickle_load("tmp/entities_table.pkl")
+    relationships_table = pickle_load("tmp/relationships_table.pkl")
+    asyncio.run(finalize_graph(entities_table, relationships_table))
+    print("hello")

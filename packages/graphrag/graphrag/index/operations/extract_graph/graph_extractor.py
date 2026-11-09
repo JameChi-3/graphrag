@@ -8,6 +8,7 @@ import re
 import traceback
 from typing import TYPE_CHECKING, Any
 
+from graphrag.utils.format_messages import format_messages
 import pandas as pd
 from graphrag_llm.utils import (
     CompletionMessagesBuilder,
@@ -22,7 +23,7 @@ from graphrag.prompts.index.extract_graph import (
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
-    from graphrag_llm.types import LLMCompletionMessagesParam, LLMCompletionResponse
+    from graphrag_llm.types import LLMCompletionResponse
 
 INPUT_TEXT_KEY = "input_text"
 RECORD_DELIMITER_KEY = "record_delimiter"
@@ -59,7 +60,10 @@ class GraphExtractor:
     async def __call__(
         self, text: str, entity_types: list[str], source_id: str
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
-        """Extract entities and relationships from the supplied text."""
+        """
+        Extract entities and relationships from the supplied text.
+        这里主要进行两个步骤，第一步是提取实体关系，第二步是切除长字符串进行提取
+        """
         try:
             # Invoke the entity extraction
             logger.info(f"start  Invoke the entity extraction")
@@ -93,7 +97,7 @@ class GraphExtractor:
             })
         )
 
-        logger.info("messages:\n%s", _format_messages(messages_builder.build()))
+        logger.info("messages:\n%s", format_messages(messages_builder.build()))
 
         response: LLMCompletionResponse = await self._model.completion_async(
             messages=messages_builder.build(),
@@ -121,7 +125,7 @@ class GraphExtractor:
                 logger.info(
                     "[%s] messages:\n%s",
                     cnt,
-                    _format_messages(messages_builder.build()),
+                    format_messages(messages_builder.build()),
                 )
                 response: LLMCompletionResponse = await self._model.completion_async(
                     messages=messages_builder.build(),
@@ -141,7 +145,7 @@ class GraphExtractor:
                 logger.info(
                     "[%s] messages:\n%s",
                     cnt,
-                    _format_messages(messages_builder.build()),
+                    format_messages(messages_builder.build()),
                 )
                 
                 response: LLMCompletionResponse = await self._model.completion_async(
@@ -212,15 +216,6 @@ class GraphExtractor:
         )
 
         return entities_df, relationships_df
-
-
-def _format_messages(messages: "LLMCompletionMessagesParam") -> str:
-    """Display chat roles and message bodies with their original line breaks."""
-    if isinstance(messages, str):
-        return messages
-    return "\n\n".join(
-        f"{message['role']}>\n{message.get('content') or ''}" for message in messages
-    )
 
 
 def _empty_entities_df() -> pd.DataFrame:

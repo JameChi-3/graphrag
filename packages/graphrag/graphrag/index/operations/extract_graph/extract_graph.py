@@ -70,6 +70,9 @@ async def extract_graph(
     relationships = _merge_relationships(relationship_dfs)
     relationships = filter_orphan_relationships(relationships, entities)
 
+    logger.info(f"{entities=}")
+    logger.info(f"{relationships=}")
+
     return (entities, relationships)
 
 

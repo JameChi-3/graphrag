@@ -34,6 +34,23 @@ async def finalize_entities(
     -------
         list[dict[str, Any]]
             Sample of up to 5 entity rows for logging.
+    
+    读取实体行，通过度值进行补充，然后写回原表。
+
+    逐行处理实体表，按标题去重，从预计算的度映射中获取度值，
+    并将每条处理后的行写回同一张表（当使用 truncate=True 时更安全，因为该方式从原表读取数据并写入临时文件）。
+
+    参数
+    ----
+        entities_table: 表
+            用于读取输入和写入输出的表。
+        degree_map: dict[str, int]
+            预计算的实体标题与节点度值的映射表。
+
+    返回
+    -------
+        list[dict[str, Any]]
+            最多5条实体行的样本数据，用于记录。
     """
     sample_rows: list[dict[str, Any]] = []
     seen_titles: set[str] = set()

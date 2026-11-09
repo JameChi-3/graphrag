@@ -34,6 +34,22 @@ def filter_orphan_relationships(
     pd.DataFrame
         Relationships filtered to only those whose ``source``
         and ``target`` both appear in ``entities["title"]``.
+    移除源或目标没有实体条目的关系
+
+    在LLM图提取之后，模型可能会在没有对应实体行的关系中生成实体名称。此功能会删除这些多余的引用，使下游处理不会遇到断裂的图边
+
+    参数
+
+    关系：
+    包含至少“源”和“目标”列的合并关系数据框
+
+    实体：
+    包含至少“标题”列的合并实体数据框
+
+    返回结果
+
+    pd数据框
+    仅保留那些“源”和“目标”均出现在“实体[标题]”中的关系
     """
     if relationships.empty or entities.empty:
         return relationships.iloc[0:0].reset_index(drop=True)

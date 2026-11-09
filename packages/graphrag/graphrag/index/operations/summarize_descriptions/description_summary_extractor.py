@@ -8,10 +8,15 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from graphrag.index.typing.error_handler import ErrorHandlerFn
+from graphrag.utils.format_messages import format_messages
 
 if TYPE_CHECKING:
     from graphrag_llm.completion import LLMCompletion
     from graphrag_llm.types import LLMCompletionResponse
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 # these tokens are used in the prompt
 ENTITY_NAME_KEY = "entity_name"
@@ -130,5 +135,16 @@ class SummarizeExtractor:
                 MAX_LENGTH_KEY: self._max_summary_length,
             }),
         )  # type: ignore
+
+        messages =self._summarization_prompt.format(**{
+                ENTITY_NAME_KEY: json.dumps(id, ensure_ascii=False),
+                DESCRIPTION_LIST_KEY: json.dumps(
+                    sorted(descriptions), ensure_ascii=False
+                ),
+                MAX_LENGTH_KEY: self._max_summary_length,
+            })
+
+        logger.info(f"user: \n{format_messages(messages)}\n---------\nai: {response.content}")
+        
         # Calculate result
         return response.content

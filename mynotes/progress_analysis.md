@@ -62,6 +62,22 @@ PipelineFactory.register_all({  # noqa: RUF067
 ### 提取图结构
 
 对应的注册步骤是
-`"extract_graph`
+`"extract_graph"`
 
-### 
+代码文件在[graph_extractor.py](../packages/graphrag/graphrag/index/operations/extract_graph/graph_extractor.py)
+
+这里主要进行两个步骤，
+第一步是提取实体关系，对应函数是 `_process_document`
+第二步是切除长字符串进行提取, 对应函数是 `_process_result`
+
+对于数据的后处理：
+
+
+==如果只是学习关系提取，核心看这个步骤就可以了==
+
+### 设置最终的图结构
+
+对应的注册步骤是
+`"finalize_graph"`
+
+代码文件在[finalize_graph.py](../packages/graphrag/graphrag/index/workflows/finalize_graph.py)

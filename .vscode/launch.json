@@ -3,13 +3,25 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			// 调试指定的python文件为入口开始
+			"name": "debug .py",
+			"type": "debugpy",
+			"request": "launch",
+			"cwd": "${workspaceFolder}",
+			"program": "${file}",
+			"console": "integratedTerminal",
+			// "env": {
+				// "PYTHONPATH": "${workspaceFolder}"
+			// }
+		},
+		{
 			"name": "Indexer",
 			"type": "debugpy",
 			"request": "launch",
 			"module": "graphrag",
 			"args": [
 				"index",
-				"--root", 
+				"--root",
 				"${input:root_folder}"
 			],
 			"console": "integratedTerminal"
@@ -21,7 +33,7 @@
 			"module": "graphrag",
 			"args": [
 				"update",
-				"--root", 
+				"--root",
 				"${input:root_folder}"
 			],
 			"console": "integratedTerminal"
@@ -33,10 +45,11 @@
 			"module": "graphrag",
 			"args": [
 				"query",
-                "${input:query}",
-				"--root", 
+				"${input:query}",
+				"--root",
 				"${input:root_folder}",
-				"--method", "${input:query_method}"
+				"--method",
+				"${input:query_method}"
 			]
 		},
 		{
@@ -45,7 +58,8 @@
 			"request": "launch",
 			"module": "uv",
 			"args": [
-				"poe", "prompt-tune",
+				"poe",
+				"prompt-tune",
 				"--config",
 				"${input:root_folder}/settings.yaml",
 			]
@@ -57,10 +71,11 @@
 			"module": "pytest",
 			"args": [
 				"./tests/integration/vector_stores",
-				"-k", "test_azure_ai_search"
+				"-k",
+				"test_azure_ai_search"
 			],
 			"console": "integratedTerminal",
-    		"justMyCode": false 
+			"justMyCode": false
 		},
 		{
 			"name": "Debug Verbs Pytest",
@@ -69,10 +84,11 @@
 			"module": "pytest",
 			"args": [
 				"./tests/verbs",
-				"-k", "test_generate_text_embeddings"
+				"-k",
+				"test_generate_text_embeddings"
 			],
 			"console": "integratedTerminal",
-    		"justMyCode": false 
+			"justMyCode": false
 		},
 		{
 			"name": "Debug Smoke Pytest",
@@ -81,27 +97,28 @@
 			"module": "pytest",
 			"args": [
 				"./tests/smoke",
-				"-k", "test_fixtures"
+				"-k",
+				"test_fixtures"
 			],
 			"console": "integratedTerminal",
-    		"justMyCode": false 
+			"justMyCode": false
 		},
 	],
-    "inputs": [
-        {
-            "id": "root_folder",
-            "type": "promptString",
-            "description": "Enter the root folder path"
-        },
-        {
-            "id": "query_method",
-            "type": "promptString",
-            "description": "Enter the query method (e.g., 'global', 'local')"
-        },
-        {
-            "id": "query",
-            "type": "promptString",
-            "description": "Enter the query text"
-        }
-    ]
+	"inputs": [
+		{
+			"id": "root_folder",
+			"type": "promptString",
+			"description": "Enter the root folder path"
+		},
+		{
+			"id": "query_method",
+			"type": "promptString",
+			"description": "Enter the query method (e.g., 'global', 'local')"
+		},
+		{
+			"id": "query",
+			"type": "promptString",
+			"description": "Enter the query text"
+		}
+	]
 }

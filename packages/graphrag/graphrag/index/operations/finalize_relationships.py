@@ -33,7 +33,24 @@ async def finalize_relationships(
     -------
         list[dict[str, Any]]
             Sample of up to 5 relationship rows for logging.
+
+
+    去重关系，通过合并度值进行丰富处理，并写入数据
+
+    通过关系表流处理数据，按（来源、目标）对进行去重，计算合并度值为来源节点与目标节点度值之和，然后将每个最终化的行重新写入表中
+
+   参数
+        
+      关系表：用于读取和写入关系行的表
+      度值映射表：dict [str , int]
+           预先计算好的实体标题与节点度值的映射关系
+
+   返回
+           
+      列表 [dict [str , Any ]]
+           最多5条关系行的样本数据用于记录
     """
+
     sample_rows: list[dict[str, Any]] = []
     seen: set[tuple[str, str]] = set()
     human_readable_id = 0
